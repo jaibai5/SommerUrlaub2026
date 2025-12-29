@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Urlaubsplanung Göteborg 2026</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --header-bg: #34495e;
+            --bg: #f0f2f5;
+            --white: #ffffff;
+            --border: #dfe6e9;
+            --score-high: #27ae60;
+            --score-med: #f39c12;
+            --score-low: #c0392b;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            flex: 0 0 auto;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 { color: var(--primary); margin: 0 0 2px 0; font-size: 1.1rem; text-align: center; }
+        p.subtitle { color: #666; font-size: 0.75rem; margin: 0 0 8px 0; text-align: center; }
+
+        .action-area {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+            justify-content: center;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-share { background-color: #2980b9; }
+        .btn-reset { background-color: #c0392b; max-width: 50px; }
+        .btn-action:active { opacity: 0.7; transform: scale(0.98); }
+
+        .scroll-container {
+            flex: 1 1 auto;
+            overflow: auto;
+            padding: 5px;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0;
+            min-width: 950px; 
+            background: white;
+        }
+
+        thead th { 
+            position: sticky; 
+            top: 0; 
+            background-color: var(--header-bg); 
+            color: white; 
+            z-index: 1000;
+            padding: 6px 4px; 
+            text-align: center; 
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #1a252f;
+            height: 32px;
+        }
+
+        td { 
+            padding: 8px 6px; 
+            border-bottom: 1px solid var(--border); 
+            vertical-align: top; 
+            font-size: 0.85rem; 
+            background: white; 
+        }
+        
+        tbody tr:hover td { background-color: #f8f9fa; }
+
+        .col-region { min-width: 190px; text-align: left; }
+        .col-data { min-width: 90px; text-align: center; }
+        .col-rating { min-width: 140px; text-align: center; }
+        .col-check { min-width: 170px; text-align: center; }
+        .col-links { min-width: 130px; text-align: center; }
+        .col-vote { min-width: 100px; text-align: center; }
+
+        .region-name { font-weight: 700; font-size: 0.95rem; color: #2c3e50; display: block; margin-bottom: 2px; }
+        .region-desc { font-size: 0.75rem; color: #7f8c8d; line-height: 1.25; }
+        .req-tag { font-size: 0.65rem; color: #e67e22; display: block; margin-top: 3px; font-weight: 700; }
+        .price-tag { font-weight: 700; color: #27ae60; font-size: 0.85rem; white-space: nowrap; }
+
+        .portal-rating { display: flex; align-items: center; justify-content: center; font-size: 0.7rem; margin-bottom: 2px; color: #555; white-space: nowrap; }
+        .portal-label { font-weight: 600; margin-right: 4px; }
+
+        .score-wrapper { position: relative; display: inline-block; cursor: help; }
+        .gemini-badge { 
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 12px; color: white; 
+            font-weight: bold; font-size: 0.85rem; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .tooltip-box {
+            visibility: hidden;
+            width: 240px;
+            background-color: #2d3436;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 3000;
+            top: 50%; right: 110%; transform: translateY(-50%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            font-size: 0.75rem; line-height: 1.4; opacity: 0; transition: opacity 0.15s;
+            pointer-events: none;
+        }
+        @media (max-width: 1100px) {
+            .tooltip-box { right: auto; left: 50%; top: 120%; transform: translateX(-50%); }
+        }
+        .score-wrapper:hover .tooltip-box { visibility: visible; opacity: 1; }
+        
+        .tt-title { font-weight: bold; color: #dfe6e9; border-bottom: 1px solid #636e72; padding-bottom: 3px; margin-bottom: 5px; display: block; text-transform: uppercase; font-size: 0.7rem;}
+        .tt-section { margin-bottom: 4px; }
+        .tt-pro { color: #55efc4; font-weight: bold; } 
+        .tt-con { color: #ff7675; font-weight: bold; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+        .btn-link {
+            display: block; width: 85%; text-align: center; padding: 5px 0; background: #ecf0f1; color: #2c3e50;
+            text-decoration: none; border-radius: 4px; font-size: 0.7rem; border: 1px solid #bdc3c7; font-weight: 600;
+        }
+        .btn-link:hover { background: #dfe6e9; }
+        
+        select { 
+            padding: 6px 2px; border-radius: 4px; border: 1px solid #b2bec3; width: 90%; 
+            cursor: pointer; font-weight: bold; font-size: 0.8rem; text-align: center; text-align-last: center;
+            background-color: white; -webkit-appearance: none;
+        }
+        
+        .status-super { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .status-gehtso { background-color: #fff3cd; color: #856404; border-color: #ffeeba; }
+        .status-nedanke { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <h1>Göteborg 2026: Mark & Sandra</h1>
+        <p class="subtitle">2+ Schlafzimmer/Bäder | Freistehend</p>
+        
+        <div class="action-area">
+            <button class="btn-action btn-share" onclick="copyShareLink()">
+                🔗 Aktuellen Stand teilen
+            </button>
+            <button class="btn-action btn-reset" onclick="resetData()">
+                🗑️
+            </button>
+        </div>
+    </div>
+
+    <div class="scroll-container">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-region">Region / Haus</th>
+                    <th class="col-data">Fahrt / Preis</th>
+                    <th class="col-rating">Bewertungen</th>
+                    <th class="col-check">Familien-Check</th>
+                    <th class="col-links">Links</th>
+                    <th class="col-vote">Mark</th>
+                    <th class="col-vote">Sandra</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'goteborg_2026_votes_final';
+
+        const locations = [
+            { 
+                name: "Hovås / Billdal", desc: "Gehobene Küstenvororte südlich.", dist: "20 Min.", price: "ca. 1.650 €", 
+                ratings: [{src:"Airbnb", val:"4.9"}, {src:"Booking", val:"9.0"}], score: 9.5, 
+                pro: "Sehr hoher Standard, oft Villen mit Garten und Trampolin. Sehr sicher.", 
+                con: "Hohes Preisniveau, keine 'wilde' Natur.", q: "Hovås Billdal Villa" 
+            },
+            { 
+                name: "Tjörn (Skärhamn)", desc: "Moderne Architektur am Meer.", dist: "50 Min.", price: "ca. 1.600 €", 
+                ratings: [{src:"Booking", val:"8.9"}, {src:"TripAdv", val:"4.6"}], score: 9.4, 
+                pro: "Abenteuer-Faktor (Krabbenfischen) top. Viele neue Häuser mit 2 Bädern.", 
+                con: "Man braucht das Auto für alles. Felsige Umgebung (Achtung Kleinkinder).", q: "Skärhamn House" 
+            },
+            { 
+                name: "Särö (Halbinsel)", desc: "Exklusives Villenviertel.", dist: "25 Min.", price: "ca. 1.850 €", 
+                ratings: [{src:"Airbnb", val:"4.95"}, {src:"Fewo", val:"4.8"}], score: 9.3, 
+                pro: "Traumhafte Lage. Meist sehr großzügige Häuser mit Gäste-WC.", 
+                con: "Sehr teuer. Wenig Shopping/Gastro direkt fußläufig.", q: "Särö" 
+            },
+            { 
+                name: "Mölnlycke", desc: "Wohlhabende Kleinstadt am See.", dist: "15 Min.", price: "ca. 1.500 €", 
+                ratings: [{src:"Booking", val:"8.9"}, {src:"Google", val:"4.6"}], score: 9.2, 
+                pro: "Extrem nah zu Liseberg. Moderne Häuserstandard (Wärmepumpe, 2 Bäder).", 
+                con: "Eher Wohnsiedlung als Urlaubsfeeling.", q: "Mölnlycke House" 
+            },
+            { 
+                name: "Lerum (Villen)", desc: "Große Häuser am Aspen See.", dist: "20 Min.", price: "ca. 1.350 €", 
+                ratings: [{src:"Booking", val:"8.7"}, {src:"Airbnb", val:"4.9"}], score: 9.1, 
+                pro: "S-Bahn Anschluss! Toller Badesee. Gute Infrastruktur.", 
+                con: "Durch die Bahnlinie teils hörbarer Verkehr (je nach Lage).", q: "Lerum Villa" 
+            },
+            { 
+                name: "Vrångö (Privat)", desc: "Autofrei, Schäreninsel.", dist: "60 Min.", price: "ca. 1.800 €", 
+                ratings: [{src:"Airbnb", val:"4.9"}, {src:"Booking", val:"9.2"}], score: 9.1, 
+                pro: "Keine Autos = Eltern entspannt. Natur pur.", 
+                con: "Gepäck muss geschleppt werden. Wenige Häuser mit 2 Bädern verfügbar.", q: "Vrångö House" 
+            },
+            { 
+                name: "Härryda (Villen)", desc: "Waldregion, große Häuser.", dist: "20 Min.", price: "ca. 1.250 €", 
+                ratings: [{src:"Airbnb", val:"4.8"}, {src:"Booking", val:"8.6"}], score: 9.0, 
+                pro: "Viel Privatsphäre. Oft große Grundstücke im Wald.", 
+                con: "Ohne Auto aufgeschmissen. Abends sehr dunkel/einsam.", q: "Härryda Villa" 
+            },
+            { 
+                name: "Kullavik", desc: "Beliebter Küstenort.", dist: "20 Min.", price: "ca. 1.600 €", 
+                ratings: [{src:"Booking", val:"8.8"}, {src:"Google", val:"4.5"}], score: 9.0, 
+                pro: "Viele Familien, Spielplätze. Meerblick oft inklusive.", 
+                con: "Dicht besiedelt, Nachbarn sind nah.", q: "Kullavik" 
+            },
+            { 
+                name: "Hönö (Klåva)", desc: "Insel, belebter Hafen.", dist: "50 Min.", price: "ca. 1.450 €", 
+                ratings: [{src:"Airbnb", val:"4.8"}, {src:"Booking", val:"8.6"}], score: 9.0, 
+                pro: "Ganzjährig belebt, Restaurants offen. Gute Häuser.", 
+                con: "Touristenbusse im Sommer. Fähre kann Wartezeit haben.", q: "Hönö House" 
+            },
+            { 
+                name: "Torslanda", desc: "Westlicher Küstenvorort.", dist: "25 Min.", price: "ca. 1.400 €", 
+                ratings: [{src:"Airbnb", val:"4.8"}, {src:"Booking", val:"8.5"}], score: 8.9, 
+                pro: "Praktische Lage. Viele Neubauten.", 
+                con: "Teils Blick auf Industriehafen/Raffinerie in der Ferne.", q: "Torslanda" 
+            },
+            { 
+                name: "Öckerö", desc: "Nachbarinsel von Hönö.", dist: "50 Min.", price: "ca. 1.350 €", 
+                ratings: [{src:"Airbnb", val:"4.7"}, {src:"Google", val:"4.5"}], score: 8.9, 
+                pro: "Ruhiger als Hönö, aber gleiche schöne Landschaft.", 
+                con: "Weniger Gastro als auf Hönö.", q: "Öckerö House" 
+            },
+            { 
+                name: "Åsa (Strand)", desc: "Küste im Süden.", dist: "45 Min.", price: "ca. 1.300 €", 
+                ratings: [{src:"Novasol", val:"4.6"}, {src:"Airbnb", val:"4.8"}], score: 8.9, 
+                pro: "Bester Sandstrand. Echtes Ferien-Feeling.", 
+                con: "Längere Anfahrt nach Liseberg.", q: "Åsa Halland House" 
+            },
+            { 
+                name: "Onsala", desc: "Villen am Meer.", dist: "40 Min.", price: "ca. 1.450 €", 
+                ratings: [{src:"Fewo", val:"4.7"}, {src:"Airbnb", val:"4.8"}], score: 8.8, 
+                pro: "Exklusiv & ruhig. Große Gärten.", 
+                con: "Weitläufig, man fährt lange kleine Straßen.", q: "Onsala" 
+            },
+            { 
+                name: "Alingsås", desc: "Holzstadt, große Objekte.", dist: "40 Min.", price: "ca. 1.150 €", 
+                ratings: [{src:"Airbnb", val:"4.8"}, {src:"Booking", val:"8.8"}], score: 8.7, 
+                pro: "Charmanter Stadtkern (Cafés). See ist flach (kindgerecht).", 
+                con: "Kein Meer. Etwas weiter weg.", q: "Alingsås House" 
+            },
+            { 
+                name: "Partille", desc: "Am See, stadtnah.", dist: "15 Min.", price: "ca. 1.400 €", 
+                ratings: [{src:"Booking", val:"8.5"}, {src:"Google", val:"4.4"}], score: 8.7, 
+                pro: "Kürzester Weg. Modernes Wohnen.", 
+                con: "Wenig Urlaubsflair, eher Vorstadt-Feeling.", q: "Partille House" 
+            },
+            { 
+                name: "Orust", desc: "Große Insel.", dist: "75 Min.", price: "ca. 1.250 €", 
+                ratings: [{src:"Fewo", val:"4.6"}, {src:"Novasol", val:"4.4"}], score: 8.6, 
+                pro: "Viel Natur, Bauernhöfe, günstig für die Größe.", 
+                con: "Über 1h Fahrt. Man sitzt viel im Auto.", q: "Orust House" 
+            },
+            { 
+                name: "Floda", desc: "Am See Sävelången.", dist: "25 Min.", price: "ca. 1.150 €", 
+                ratings: [{src:"Booking", val:"8.5"}, {src:"Google", val:"4.5"}], score: 8.6, 
+                pro: "Schloss Nääs in der Nähe (toll für Kinder).", 
+                con: "Zersiedelt, man braucht das Auto.", q: "Floda" 
+            },
+            { 
+                name: "Landvetter", desc: "Ruhige Wohngebiete.", dist: "15 Min.", price: "ca. 1.100 €", 
+                ratings: [{src:"Google", val:"4.3"}, {src:"Airbnb", val:"4.7"}], score: 8.5, 
+                pro: "Sehr schnell in der Stadt und am Flughafen.", 
+                con: "Fluglärm möglich (je nach Wind).", q: "Landvetter House" 
+            },
+            { 
+                name: "Varberg", desc: "Surfer-Hotspot.", dist: "55 Min.", price: "ca. 1.350 €", 
+                ratings: [{src:"Booking", val:"8.8"}, {src:"Google", val:"4.7"}], score: 8.5, 
+                pro: "Tolle Stadt, Festung, Strand.", 
+                con: "Fast 1h Fahrt pro Strecke ist viel mit Kindern.", q: "Varberg House" 
+            },
+            { 
+                name: "Lysekil", desc: "Exklusive Kapitäns-Villen.", dist: "85 Min.", price: "ca. 1.650 €", 
+                ratings: [{src:"TripAdv", val:"4.8"}, {src:"Booking", val:"9.1"}], score: 8.5, 
+                pro: "Bildschön. Wahrscheinlich die schönsten Häuser.", 
+                con: "Zu weit weg für tägliche Ausflüge nach Gbg.", q: "Fiskebäckskil" 
+            },
+            { 
+                name: "Hindås", desc: "Feriendorf & Häuser.", dist: "30 Min.", price: "ca. 1.050 €", 
+                ratings: [{src:"Booking", val:"8.4"}, {src:"Novasol", val:"4.5"}], score: 8.4, 
+                pro: "Günstig. Viel Wald.", 
+                con: "Viele ältere Häuser haben nur 1 Bad (gut prüfen!).", q: "Hindås" 
+            },
+            { 
+                name: "Kungälv", desc: "Historisch, nördlich.", dist: "20 Min.", price: "ca. 1.000 €", 
+                ratings: [{src:"Airbnb", val:"4.6"}, {src:"Google", val:"4.4"}], score: 8.3, 
+                pro: "Festung Bohus (Ritter!). Günstiger.", 
+                con: "Kein Meer, 'nur' Fluss.", q: "Kungälv House" 
+            },
+            { 
+                name: "Bollebygd", desc: "Tiefe Wälder.", dist: "35 Min.", price: "ca. 950 €", 
+                ratings: [{src:"Airbnb", val:"4.7"}, {src:"Novasol", val:"4.4"}], score: 8.2, 
+                pro: "Ruhe pur. Große Grundstücke.", 
+                con: "Abgeschieden. Teenager finden es langweilig.", q: "Bollebygd House" 
+            },
+            { 
+                name: "Stenungsund", desc: "Nördlich, Festland.", dist: "40 Min.", price: "ca. 1.200 €", 
+                ratings: [{src:"Booking", val:"8.3"}, {src:"Fewo", val:"4.3"}], score: 8.1, 
+                pro: "Gute Versorgung (Shopping).", 
+                con: "Industrie-Charakter an manchen Ecken.", q: "Stenungsund House" 
+            },
+            { 
+                name: "Lindome", desc: "Südlicher Vorort.", dist: "15 Min.", price: "ca. 1.100 €", 
+                ratings: [{src:"Google", val:"4.2"}, {src:"Booking", val:"8.1"}], score: 8.0, 
+                pro: "Praktisch. Oft 2 Bäder in Reihenhäusern.", 
+                con: "Reine Schlafstadt.", q: "Lindome" 
+            },
+            { 
+                name: "Olofstorp", desc: "Ländlich, Pferdehöfe.", dist: "20 Min.", price: "ca. 1.050 €", 
+                ratings: [{src:"Airbnb", val:"4.6"}, {src:"Google", val:"4.2"}], score: 8.0, 
+                pro: "Nett & Grün.", 
+                con: "Weder richtig Stadt noch richtig Wildnis.", q: "Olofstorp" 
+            },
+            { 
+                name: "Kode", desc: "Ruhiges Hinterland.", dist: "35 Min.", price: "ca. 1.000 €", 
+                ratings: [{src:"Novasol", val:"4.4"}, {src:"Airbnb", val:"4.6"}], score: 8.0, 
+                pro: "Entspannt.", 
+                con: "Man braucht immer das Auto.", q: "Kode House" 
+            },
+            { 
+                name: "Ale", desc: "Tal nördlich.", dist: "20 Min.", price: "ca. 900 €", 
+                ratings: [{src:"Airbnb", val:"4.5"}, {src:"Google", val:"4.2"}], score: 7.9, 
+                pro: "Viel Wohnfläche für wenig Geld.", 
+                con: "Landschaftlich durchschnittlich.", q: "Ale House" 
+            },
+            { 
+                name: "Kållered", desc: "Zentral bei IKEA.", dist: "12 Min.", price: "ca. 1.200 €", 
+                ratings: [{src:"Booking", val:"8.0"}, {src:"Google", val:"4.1"}], score: 7.8, 
+                pro: "Schnellste Anreise.", 
+                con: "Laut (Autobahn/Gewerbegebiet).", q: "Kållered" 
+            },
+            { 
+                name: "Lilla Edet", desc: "Weit nördlich am Fluss.", dist: "45 Min.", price: "ca. 800 €", 
+                ratings: [{src:"Novasol", val:"4.2"}, {src:"Google", val:"4.0"}], score: 7.5, 
+                pro: "Billig. Angeln.", 
+                con: "Starke Strömung im Fluss (Gefahr), Industrie.", q: "Lilla Edet House" 
+            }
+        ];
+
+        const checkin = "2026-08-03";
+        const checkout = "2026-08-10";
+
+        function init() {
+            renderTable();
+            // 1. ZUERST lokale Daten laden (Dein Stand)
+            let localData = {};
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                localData = JSON.parse(stored);
+            }
+
+            // 2. DANN Link-Daten prüfen (Update von Sandra)
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.has('d')) {
+                try {
+                    const sharedData = JSON.parse(atob(urlParams.get('d')));
+                    
+                    // MERGE LOGIK: Wir überschreiben lokale Daten nur, wenn im Link was "Neues" steht.
+                    // Aber wir behalten lokale Daten, wenn im Link nur "neutral" steht.
+                    let mergedData = { ...localData }; // Kopie vom lokalen Stand
+                    let newInfoFound = false;
+
+                    for (const [key, val] of Object.entries(sharedData)) {
+                        // Wenn im Link eine echte Bewertung steht (nicht neutral), übernehmen wir sie.
+                        if (val !== 'neutral') {
+                            // Aber Moment: Wenn ich (Mark) lokal "Super" habe und im Link steht "Mark: Super", ist alles gut.
+                            // Wenn im Link steht "Mark: Geht so" (weil Sandra eine alte Version hatte),
+                            // sollten wir aufpassen.
+                            // IDEAL: Wir nehmen an, der Link ist "aktueller", WENN es um die ANDERE Person geht.
+                            // ODER: Wir mergen einfach alles, was nicht "neutral" ist.
+                            
+                            // Einfache Merge Strategie: Alles was im Link gesetzt ist, gewinnt.
+                            // Das erlaubt Sandra, auch DEINE Spalte zu ändern (unwahrscheinlich),
+                            // aber vor allem füllt es IHRE Spalte bei dir auf.
+                            if (mergedData[key] !== val) {
+                                mergedData[key] = val;
+                                newInfoFound = true;
+                            }
+                        }
+                    }
+
+                    if (newInfoFound) {
+                        applyData(mergedData);
+                        saveToLocal(mergedData);
+                        // Clean URL damit beim Refresh nicht immer neu geladen wird
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        alert("Daten von Sandra erfolgreich eingefügt! ✅");
+                    } else {
+                        applyData(localData); // Nichts neues im Link, lade lokal
+                    }
+
+                } catch(e) { 
+                    console.error("Link Fehler", e); 
+                    applyData(localData);
+                }
+            } else {
+                // Kein Link, einfach lokal laden
+                applyData(localData);
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            let html = '';
+
+            locations.forEach((loc, index) => {
+                let ratingsHTML = loc.ratings.map(r => `<div class="portal-rating"><span class="portal-label">${r.src}:</span> ${r.val}</div>`).join('');
+                let badgeColor = loc.score >= 9 ? 'var(--score-high)' : (loc.score >= 8 ? 'var(--score-med)' : 'var(--score-low)');
+
+                const linkBooking = `https://www.booking.com/searchresults.de.html?ss=${encodeURIComponent(loc.q)}&checkin=${checkin}&checkout=${checkout}&group_adults=2&group_children=2&min_bedrooms=2&ht_id=220`;
+                const linkAirbnb = `https://www.airbnb.de/s/${encodeURIComponent(loc.q)}/homes?checkin=${checkin}&checkout=${checkout}&adults=2&children=2&min_bedrooms=2&min_bathrooms=2`;
+                const linkFewo = `https://www.fewo-direkt.de/search/keywords:${encodeURIComponent(loc.q)}/arrival:${checkin}/departure:${checkout}?adultsCount=2&childrenCount=2&minBedrooms=2&minBathrooms=2`;
+
+                html += `
+                <tr>
+                    <td>
+                        <span class="region-name">${loc.name}</span>
+                        <span class="region-desc">${loc.desc}</span>
+                        <span class="req-tag">2+ Bäder/Zimmer</span>
+                    </td>
+                    <td><b>${loc.dist}</b><br><span class="price-tag">${loc.price}</span></td>
+                    <td>${ratingsHTML}</td>
+                    <td>
+                        <div class="score-wrapper">
+                            <span class="gemini-badge" style="background-color:${badgeColor}">
+                                ${loc.score}/10 ℹ️
+                            </span>
+                            <div class="tooltip-box">
+                                <span class="tt-title">AI-Check:</span>
+                                <div class="tt-section"><span class="tt-pro">✅ PLUS:</span> ${loc.pro}</div>
+                                <div class="tt-section"><span class="tt-con">⚠️ MINUS:</span> ${loc.con}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="${linkBooking}" target="_blank" class="btn-link">Booking</a>
+                            <a href="${linkAirbnb}" target="_blank" class="btn-link">Airbnb</a>
+                            <a href="${linkFewo}" target="_blank" class="btn-link">FeWo</a>
+                        </div>
+                    </td>
+                    <td>
+                        <select id="mark-${index}" onchange="updateVote(this)">
+                            <option value="neutral">-</option>
+                            <option value="super">Super</option>
+                            <option value="gehtso">Geht so</option>
+                            <option value="nedanke">Nein</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="sandra-${index}" onchange="updateVote(this)">
+                            <option value="neutral">-</option>
+                            <option value="super">Super</option>
+                            <option value="gehtso">Geht so</option>
+                            <option value="nedanke">Nein</option>
+                        </select>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function updateVote(elem) {
+            colorize(elem);
+            const currentData = collectData();
+            saveToLocal(currentData);
+        }
+
+        function colorize(elem) {
+            elem.className = ''; 
+            if (elem.value !== 'neutral') elem.classList.add('status-' + elem.value);
+        }
+
+        function collectData() {
+            const data = {};
+            locations.forEach((_, i) => {
+                const m = document.getElementById(`mark-${i}`);
+                const s = document.getElementById(`sandra-${i}`);
+                if (m) data[`mark-${i}`] = m.value;
+                if (s) data[`sandra-${i}`] = s.value;
+            });
+            return data;
+        }
+
+        function saveToLocal(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function applyData(data) {
+            for (const [key, val] of Object.entries(data)) {
+                const el = document.getElementById(key);
+                if(el) { el.value = val; colorize(el); }
+            }
+        }
+
+        function copyShareLink() {
+            const data = collectData();
+            const encoded = btoa(JSON.stringify(data));
+            const url = window.location.protocol + "//" + window.location.host + window.location.pathname + "?d=" + encoded;
+            
+            if(navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert("Link kopiert! ✅\nAn Sandra senden.");
+                }).catch(err => {
+                    prompt("Link kopieren:", url);
+                });
+            } else {
+                prompt("Link kopieren:", url);
+            }
+        }
+
+        function resetData() {
+            if(confirm("Alles löschen?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                window.location.href = window.location.pathname; 
+            }
+        }
+
+        init();
+    </script>
+
+</body>
+</html>
